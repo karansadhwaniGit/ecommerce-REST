@@ -55,4 +55,13 @@ class User extends Authenticatable
     {
         return Str::random(40);
     }
+    /*Mutators*/
+    public function setNameAttribute(string $name)
+    {
+        $this->attributes['name']=strtolower($name);
+    }
+    public function setEmailAttribute(string $email)
+    {
+        $this->attributes['email']=strtolower($email);
+    }
 }

@@ -21,7 +21,7 @@ class CreateUsersTable extends Migration
             $table->string('password');
             $table->rememberToken();
             $table->tinyInteger('verified')->unsigned()->default(User::VERIFIED_USER);
-            $table->string('verified_token');
+            $table->string('verification_token')->nullable();
             $table->boolean('admin');
             $table->timestamps();
         });

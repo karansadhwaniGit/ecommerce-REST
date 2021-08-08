@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\User;
 use Illuminate\Http\Request;
 
 class UsersController extends Controller
@@ -13,18 +14,29 @@ class UsersController extends Controller
      */
     public function index()
     {
-        //
+        $users = User::all();
+        return response()->json(['data'=>$users],200);
+    }
+    public function store(Request $request)
+    {
+        $rules=[
+            'name'=>'required',
+            'email'=>'required|email|unique:users',
+            'password'=>'required|min:8|confirmed'
+        ];
+        $this->validate($request,$rules);
+
+        $data= $request->all();
+        $data['password']=bcrypt($request->password);
+        $data['verified']=User::UNVERIFIED_USER;
+        $data['verification_token']=User::generateVerficationCode();
+        $data['admin']=User::REGULAR_USER;
+
+        $user= User::create($data);
+
+        return response()->json(['data'=>$user],201);
     }
 
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function create()
-    {
-        //
-    }
 
     /**
      * Store a newly created resource in storage.
@@ -32,10 +44,6 @@ class UsersController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request)
-    {
-        //
-    }
 
     /**
      * Display the specified resource.
@@ -43,32 +51,21 @@ class UsersController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function show($id)
+    public function show(User $user)
     {
-        //
+        return response()->json(['data'=>$user],200);
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function edit($id)
+    public function update(Request $request,User $id)
     {
-        //
-    }
+        $rules=[
+            'name'=>'min:5',
+            'email'=>'email|unique:users',
+            'password'=>'min:8|confirmed',
+            'admin'=>'in'.User::REGULAR_USER. ',' . User::ADMIN_USER
+        ];
+        $this->validate($request,$rules);
 
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function update(Request $request, $id)
-    {
-        //
     }
 
     /**
@@ -77,8 +74,9 @@ class UsersController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy($id)
+    public function destroy(User $user)
     {
-        //
+        $user->delete();
+        return response()->json(['data'=>$user],200);
     }
 }

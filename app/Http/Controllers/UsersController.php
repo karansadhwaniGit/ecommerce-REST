@@ -5,7 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\User;
 use Illuminate\Http\Request;
 
-class UsersController extends Controller
+class UsersController extends ApiController
 {
     /**
      * Display a listing of the resource.
@@ -15,7 +15,7 @@ class UsersController extends Controller
     public function index()
     {
         $users = User::all();
-        return response()->json(['data'=>$users],200);
+        return $this->showAll($users);
     }
     public function store(Request $request)
     {
@@ -34,7 +34,7 @@ class UsersController extends Controller
 
         $user= User::create($data);
 
-        return response()->json(['data'=>$user],201);
+        return $this->shwoOne($data);
     }
 
 
@@ -53,7 +53,7 @@ class UsersController extends Controller
      */
     public function show(User $user)
     {
-        return response()->json(['data'=>$user],200);
+        return $this->showOne($user);
     }
 
     public function update(Request $request,User $id)
